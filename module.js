@@ -1,5 +1,4 @@
 import path from 'path';
-import core from 'fit-core';
 import fs from 'fs';
 
 import del from 'del';
@@ -10,9 +9,10 @@ import postCssExtend from 'postcss-extend';
 import postCssNesting from 'postcss-nesting';
 import cssNano from 'cssnano';
 
-let develop, output, source, trigger, prefixer, clear;
+let utils, develop, output, source, trigger, prefixer, clear;
 
-export function init (config) {
+export function init (config, core) {
+	utils = core.utils;
 	develop = core.args.env() === 'develop';
 
 	// required
@@ -54,7 +54,7 @@ function clean () {
 
 function build () {
 	let stream;
-	let source_stuff = core.utils.filterNonExistingFiles (source);
+	let source_stuff = utils.filterNonExistingFiles (source);
 
 	if (source_stuff) {
 		if (source_stuff.length === 1) {
@@ -82,7 +82,7 @@ function build () {
 						if (result.map) fs.writeFile (source_output +'.map', result.map);
 					})
 					.catch(e => {
-						core.utils.error ('cssnext-bundle.build', '');
+						utils.error ('cssnext-bundle.build', '');
 						console.log (e);
 					});
 			});
@@ -90,7 +90,7 @@ function build () {
 			console.log('we do not support multiple entries for postcss');
 		}
 	} else {
-		core.utils.error ('trigger', source);
+		utils.error ('trigger', source);
 	}
 
 	return Promise.resolve(stream);
